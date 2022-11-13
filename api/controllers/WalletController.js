@@ -8,7 +8,7 @@
 module.exports = {
     setupWallet: (req, res) => {
         if (!req.body) {
-            sails.log.error(`Missing body! Body ${req.body}`)
+            sails.log.error(`Error in WalletController.setupWallet. Missing request body! Body ${req.body}`)
             return res.badRequest()
         }
 
@@ -33,7 +33,7 @@ module.exports = {
         const walletId = req.param('walletId')
 
         if (!req.body || !walletId) {
-            sails.log.error(`Missing credit/ debit details or wallet id. Wallet Id: ${walletId} Credit/ debit details: ${JSON.stringify(req.body)}`)
+            sails.log.error(`Error in WalletController.creditDebitAmount. Missing credit/ debit details or wallet id. Wallet Id: ${walletId} Credit/ debit details: ${JSON.stringify(req.body)}`)
             res.badRequest()
         }
 
@@ -43,6 +43,23 @@ module.exports = {
                 res.negotiate(err)
             }
             res.json(response)
+        })
+    },
+
+    getWalletDetails: (req, res) => {
+        const walletId = req.param('id')
+
+        if (!walletId) {
+            sails.log.error(`Missing wallet id. Wallet Id: ${walletId} Credit/ debit details: ${JSON.stringify(req.body)}`)
+            res.badRequest()
+        }
+
+        Wallet.findOne({id: walletId}).exec((err, foundWallet) => {
+            if (err) {
+                sails.log.error(`Error WalletController.getWalletDetails while finding wallet. Error: ${JSON.stringify(err)}`)
+                res.negotiate(err)
+            }
+            return res.json(foundWallet)
         })
     }
 };
