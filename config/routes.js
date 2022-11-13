@@ -22,6 +22,7 @@ module.exports.routes = {
   '/': { view: 'pages/homepage' },
   'POST /setup': 'WalletController.setupWallet',
   'POST /transact/:walletId': 'WalletController.creditDebitAmount',
+  'GET  /transactions': 'TransactionController.fetchTransactions',
 
 
   /***************************************************************************
