@@ -27,6 +27,23 @@ module.exports = {
             }
             return res.json(createdWalletDetails)
         })
+    },
+
+    creditDebitAmount: (req, res) => {
+        const walletId = req.param('walletId')
+
+        if (!req.body || !walletId) {
+            sails.log.error(`Missing credit/ debit details or wallet id. Wallet Id: ${walletId} Credit/ debit details: ${JSON.stringify(req.body)}`)
+            res.badRequest()
+        }
+
+        Wallet.creditDebitAmount({creditDebitData: req.body, walletId}, (err, response) => {
+            if (err) {
+                sails.log.error(`Error WalletController.creditDebitAmount. Error: ${JSON.stringify(err)}`)
+                res.negotiate(err)
+            }
+            res.json(response)
+        })
     }
 };
 
