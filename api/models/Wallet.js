@@ -17,7 +17,7 @@ module.exports = {
       required: true
     },
     date: {
-      type: 'date',
+      type: 'string',
       required: true
     }
   },
@@ -65,7 +65,7 @@ module.exports = {
         return cb(null, response)
       })
     })
-  }
+  },
 
   creditDebitAmount: (opts, cb) => {
     let {
@@ -87,37 +87,46 @@ module.exports = {
     }
 
     /****** UPDATE WALLET & CREATE NEW TRANSACTION ******/
-    Wallet.update({
+    Wallet.findOne({
       id: walletId
-    }, {
-      balance: (balance + creditDebitData.amount).toFixed(4) // correcting the updated balance to upto decimal places
-    }).exec((errWalletUpdate) => {
-      if (errWalletUpdate) {
-        sails.log.error(`Error in updating wallet, id: ${walletId}`)
-        return cb(errWalletUpdate)
+    }).exec((err, foundWallet) => {
+      if (err) {
+        sails.log.error(`Error in Wallet.creditDebitAmount while finding wallet with id: ${walletId}. Error: ${JSON.stringify(err)}`)
+        return cb(err)
       }
-
-      let newTransaction = {
-        walletId: foundWalletData.id,
-        amount: creditDebitData.amount,
-        balance: updatedBalance,
-        description: creditDebitData.description,
-        date: new Date()
-        type: (creditDebitData.amount > 0) ? "CREDIT" : "DEBIT"
-      }
-
-      // Create new transaction
-      Transaction.create(newTransaction).fetch().exec((errTran, createdTransaction) => {
-        if (errTran) {
-          sails.log.error(`Error creating & fetching wallet transaction for wallet id: ${createdWalletData.id}`)
-          return cb(errTran)
+      const updatedBalance = parseFloat(foundWallet.balance) + parseFloat(creditDebitData.amount)
+      Wallet.update({
+        id: walletId
+      }, {
+        balance: updatedBalance
+      }).exec((errWalletUpdate) => {
+        if (errWalletUpdate) {
+          sails.log.error(`Error in updating wallet, id: ${walletId}`)
+          return cb(errWalletUpdate)
         }
-        let response = {
+
+        let newTransaction = {
+          walletId: foundWallet.id,
+          amount: creditDebitData.amount,
           balance: updatedBalance,
-          transactionId: createdTransaction.id
+          description: creditDebitData.description,
+          date: new Date(),
+          type: (creditDebitData.amount > 0) ? "CREDIT" : "DEBIT"
         }
 
-        return cb(null, response)
+        // Create new transaction
+        Transaction.create(newTransaction).fetch().exec((errTran, createdTransaction) => {
+          if (errTran) {
+            sails.log.error(`Error creating & fetching wallet transaction for wallet id: ${createdWalletData.id}`)
+            return cb(errTran)
+          }
+          let response = {
+            balance: updatedBalance,
+            transactionId: createdTransaction.id
+          }
+
+          return cb(null, response)
+        })
       })
     })
   }

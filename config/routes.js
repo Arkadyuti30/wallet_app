@@ -19,7 +19,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': { view: 'pages/homepage' },
+  '/': { view: 'homepage' },
   'POST /setup': 'WalletController.setupWallet',
   'POST /transact/:walletId': 'WalletController.creditDebitAmount',
   'GET  /transactions': 'TransactionController.fetchTransactions',

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <title>My Wallet App</title>
+</head>
+<style type="text/css">
+@import url('https://fonts.cdnfonts.com/css/quicksand');
+
+body {
+  background: #FFE5D9;
+  font-family: 'Quicksand Bold', sans-serif;
+  color: #696D7D;
+}
+
+#login-container {
+  display: flex;
+  padding-top: 10vh;
+  justify-content: space-around;
+}
+
+#form-container {
+  background: #F4ACB7;
+  display: flex;
+  flex-direction: column;
+  height: 55vh;
+  width: 35vw;
+  border-radius: 40px;
+}
+
+#input-fields {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 10%;
+}
+
+.inputField {
+  width: 50%;
+  font-size: 24px;
+  border-radius: 40px;
+  height: 7vh;
+  margin-top: 5%;
+  text-align: center;
+}
+
+button {
+  width: 50%;
+  height: 7.5vh;
+  font-size: 24px;
+  border-radius: 50px;
+  text-align: center;
+  background: #696D7D;
+  color: #f5f5f5;
+  cursor: pointer;
+}
+
+h1 {
+  color: #696D7D;
+  text-align: center;
+  font-size: 64px;
+  font-family: 'Quicksand Bold', sans-serif;
+}
+
+#transaction-dashboard {
+  display: flex;
+  padding-top: 10vh;
+  justify-content: center;
+}
+
+#transactions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 10%;
+}
+
+#display-wallet {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #F4ACB7;
+  width: 30vw;
+  height: 30vh;
+  border-radius: 40px;
+}
+
+span {
+  font-size: 25px;
+}
+
+.icon {
+  height: 27px;
+  width: 27px;
+}
+
+.display-wallet-items {
+  margin-top: 5%;
+}
+
+#see-transactions-button {
+  margin-top: 7%;
+}
+
+#credit-debit-amount {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #D8E2DC;
+  width: 30vw;
+  height: 40vh;
+  border-radius: 40px;
+  margin-top: 5%;
+}
+
+
+/*** CSS for toggle switch ***/
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 75px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 15px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked+.slider {
+  background-color: #696D7D;
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #696D7D;
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 100px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/*** End of CSS for toggle switch ***/
+
+#credit-debit-cta-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 3%;
+  align-items: center;
+}
+
+#credit-debit-submit-button {
+  margin-left: 3%;
+  width: 10vw;
+}
+
+.toggle-text {
+  font-size: 12px;
+}
+
+#toggle-text-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2%;
+}
+
+</style>
+
+<body onload="onload()">
+  <h1>Welcome To Your Wallet!</h1>
+  <div id="login-container">
+    <div class="left-img-container">
+      <img src="/images/money.png">
+    </div>
+    <div id="form-container">
+      <div id="input-fields">
+        <input class="inputField" type="text" id="name" name="name" value="" placeholder="Enter wallet name..."><br>
+        <input class="inputField" type="number" id="balance" name="balance" value="" placeholder="Enter balance..."><br><br>
+        <button id="create-wallet-button" onclick="createWallet()">Create Wallet!</button>
+      </div>
+    </div>
+  </div>
+  <div id="transaction-dashboard">
+    <div class="left-img-container">
+      <img src="/images/mascot.png">
+    </div>
+    <div id="transactions">
+      <div id="display-wallet">
+        <div class="display-wallet-items">
+          <img class="icon" src="/images/translate.svg">
+          <span id="display-wallet-name">Wallet Name: </span><span id="display-wallet-name-value"></span>
+        </div>
+        <div class="display-wallet-items">
+          <img class="icon" src="/images/cash-coin.svg">
+          <span id="display-wallet-balance">Wallet Balance: </span><span id="display-wallet-balance-value"></span>
+        </div>
+        <button id="see-transactions-button">See Transactions</button>
+      </div>
+      <div id="credit-debit-amount">
+        <span>Credit/ Debit Amount from Wallet!</span>
+        <input class="inputField" type="number" step=".0001" id="credit-debit-value" name="credit-debit-value" placeholder="Enter amount...">
+        <input class="inputField" type="string" id="credit-debit-desc" name="credit-debit-desc" placeholder="Enter description...">
+        <div id="credit-debit-cta-container">
+          <div id="credit-debit-toogle-container">
+            <label class="switch">
+              <input class="credit-debit-toggle" type="checkbox" checked>
+              <span class="slider round"></span>
+            </label>
+            <div id="toggle-text-container">
+              <span class="toggle-text">Debit</span>
+              <span class="toggle-text">Credit</span>
+            </div>
+          </div>
+          <button id="credit-debit-submit-button" onclick="creditDebitAmount()">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript">
+function onload() {
+  const walletId = localStorage.getItem('walletId')
+  if (walletId) {
+    $('#login-container').css('display', 'none')
+    $('#transaction-dashboard').css('display', 'flex')
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == XMLHttpRequest.DONE) {
+        const walletDetails = JSON.parse(xhr.responseText)
+        $('#display-wallet-name-value').empty()
+        $('#display-wallet-name-value').append(walletDetails.name)
+        $('#display-wallet-balance-value').empty()
+        $('#display-wallet-balance-value').append(walletDetails.balance)
+        console.log(`Successfully fetched wallet data! Wallet data ${JSON.stringify(walletDetails)}`)
+      }
+    }
+    var requestUrl = "/wallet/" + walletId
+    xhr.open('GET', requestUrl, true);
+    xhr.send(null);
+  } else {
+    $('#login-container').css('display', 'flex')
+    $('#transaction-dashboard').css('display', 'none')
+  }
+
+}
+
+function createWallet() {
+  let walletName = document.getElementById('name').value
+  let balance = document.getElementById('balance').value
+  balance = parseFloat(balance.toFixed(4))
+  if (walletName && balance && !isNaN(balance)) {
+    $('#login-container').css('display', 'none')
+    $('#transaction-dashboard').css('display', 'flex')
+    var reqBody = {
+      balance: balance,
+      name: walletName
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/setup", true)
+    xhr.setRequestHeader('Content-type', 'application/json');
+    xhr.onreadystatechange = (response) => {
+      if (xhr.readyState == XMLHttpRequest.DONE) {
+        console.log(xhr.responseText)
+        const walletDetails = JSON.parse(xhr.responseText)
+        localStorage.setItem('walletId', walletDetails.id)
+        console.log(`Successfully created wallet! Wallet details: ${JSON.stringify(walletDetails)}`)
+        onload()
+      }
+    }
+    xhr.send(JSON.stringify(reqBody))
+  } else {
+    alert(`Missing wallet name & balance!`)
+  }
+}
+
+function creditDebitAmount() {
+  let amount = document.getElementById('credit-debit-value').value
+  let description = document.getElementById('credit-debit-desc').value
+  let creditDebitToggle = $('.credit-debit-toggle:checked').val(); // value is "on" when it's checked, ie, for CREDIT. Else it's undefined.
+  const walletId = localStorage.getItem('walletId')
+  if (walletId && amount && !isNaN(amount)) {
+    // DEBIT when creditDebitToggle is undefined
+    if (!creditDebitToggle)
+      amount = 0 - amount // negative value for debit
+
+    // if no description is present then assign an empty string
+    if (!description)
+      description = ""
+
+    let reqBody = {
+      amount: amount,
+      description: description
+    }
+    let requestUrl = "/transact/"+walletId
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", requestUrl, true)
+    xhr.setRequestHeader('Content-type', 'application/json');
+    xhr.onreadystatechange = (response) => {
+      if (xhr.readyState == XMLHttpRequest.DONE) {
+        console.log(`Transaction Successful! Transaction details: ${xhr.responseText}`)
+        $('#credit-debit-value').val(null)
+        $('#credit-debit-desc').val("")
+        onload()
+      }
+    }
+    xhr.send(JSON.stringify(reqBody))
+  } else if (!walletId) { 
+  	alert(`No wallet found!`)
+  } else {
+    alert(`Missing amount for Credit/ Debit!`)
+  }
+}
+
+</script>
+
+</html>

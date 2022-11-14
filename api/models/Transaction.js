@@ -21,7 +21,7 @@ module.exports = {
       required: true
     },
     date: {
-      type: 'date',
+      type: 'string',
       required: true
     },
     type: { // CREDIT / DEBIT
