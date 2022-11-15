@@ -1,4 +1,21 @@
-# wallet-app
+# Wallet App
+
+This app has been hosted on <b>Heroku</b>. [You can access this app publicly here](https://warm-forest-96436.herokuapp.com/) 
+
+### What is Wallet App?
+This is a wallet app with the following features:
+- Setup wallet
+- Credit / Debit transactions
+- Fetching transactions on wallet
+- Get wallet details
+
+### How to setup this project to run it locally
+1. Clone this github repo on your local
+2. You must have node & npm installed (if not, follow any tutorial to install the same)
+3. Go to the repo folder on your local and run `npm i` - this will install all the dependencies required for this project
+4. After this, run `sails lift`
+5. Go to http://localhost:1337/ - this is our Wallet App!
+
 
 a [Sails v1](https://sailsjs.com) application
 
