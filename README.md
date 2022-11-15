@@ -145,12 +145,37 @@ Note: skip is the no. of transactions it'll skip from the starting transaction. 
 Note: The response is without the first transaction (wallet initialisation) & doesn't have the last transaction as we have set the limit to 2
 
 ### Database
-- This project uses MongoDB as the database.
+- This project uses MongoDB Atlas as the database.
 - There are only 2 collections for this project:
-  - wallet - contains all wallet documents
-  - transaction - contains all transaction documents
-- Since, we fetch wallet by its id so the default indexing works, ie, id of the document
-- For tran
+  - `wallet` - contains all wallet documents
+  - `transaction` - contains all transaction documents
+- Since, we fetch `wallet` by its id so the default indexing works, ie, id of the document
+- For `transaction` an index has been created for walletId as we fetch transactions by the wallet id. This makes the fetching of the transactions more efficient & faster in case of huge no. of transaction documents
+- Sample wallet document
+  ```javascript
+    {
+      _id: ObjectId("63738fc4ca2eec302a517098"),
+      balance: 864.9988,
+      name: 'My shopping wallet',
+      date: '2022-11-15T13:10:28.852Z',
+      createdAt: 1668517828852,
+      updatedAt: 1668520519862
+    }
+  ```
+- Sample transaction document
+  ```javascript
+    {
+      _id: ObjectId("6373965e77d79d000487f4df"),
+      walletId: ObjectId("6373963f77d79d000487f4dd"),
+      amount: 111,
+      balance: 555,
+      description: 'food',
+      date: '2022-11-15T13:38:38.435Z',
+      type: 'CREDIT',
+      createdAt: 1668519518435,
+      updatedAt: 1668519518435
+    }
+  ```
 
 ### How to setup this project to run it locally
 1. Clone this github repo on your local
@@ -167,30 +192,7 @@ a [Sails v1](https://sailsjs.com) application
 
 + [Sails framework documentation](https://sailsjs.com/get-started)
 + [Version notes / upgrading](https://sailsjs.com/documentation/upgrading)
-+ [Deployment tips](https://sailsjs.com/documentation/co[
-   {
-     "description": "recharge",
-     "createdAt": 1668523957608,
-     "updatedAt": 1668523957608,
-     "id": "6373a7b5cdbbbe0004058c79",
-     "date": "2022-11-15T14:52:37.608Z",
-     "amount": 100,
-     "balance": 211,
-     "type": "CREDIT",
-     "walletId": "6373a26476fbca3e68317404"
- },
- {
-     "description": "chips",
-     "createdAt": 1668524470740,
-     "updatedAt": 1668524470740,
-     "id": "6373a9b6cdbbbe0004058c7a",
-     "date": "2022-11-15T15:01:10.740Z",
-     "amount": -10,
-     "balance": 201,
-     "type": "DEBIT",
-     "walletId": "6373a26476fbca3e68317404"
- }
-]ncepts/deployment)
++ [Deployment tips](https://sailsjs.com/documentation/concepts/deployment)
 + [Community support options](https://sailsjs.com/support)
 + [Professional / enterprise options](https://sailsjs.com/enterprise)
 
