@@ -51,7 +51,7 @@ module.exports.datastores = {
     // adapter: 'sails-mysql',
     // url: 'mysql://user:password@host:port/database',
     adapter: 'sails-mongo',
-    url: 'mongodb://ac-rzfpxwe-shard-00-01.h1vbax6.mongodb.net:27017/wallet_app'
+    url: 'mongodb+srv://arkadyuti:passw0rd@cluster0.h1vbax6.mongodb.net/wallet_app?retryWrites=true&w=majority'
 
   },
 
