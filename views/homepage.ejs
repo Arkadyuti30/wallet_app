@@ -235,7 +235,7 @@ input:checked+.slider:before {
           <img class="icon" src="/images/cash-coin.svg">
           <span id="display-wallet-balance">Wallet Balance: </span><span id="display-wallet-balance-value"></span>
         </div>
-        <button id="see-transactions-button">See Transactions</button>
+        <button id="see-transactions-button" onclick="seeTransactionsPage()">See Transactions</button>
       </div>
       <div id="credit-debit-amount">
         <span>Credit/ Debit Amount from Wallet!</span>
@@ -259,6 +259,8 @@ input:checked+.slider:before {
   </div>
 </body>
 <script type="text/javascript">
+var walletBalance
+
 function onload() {
   const walletId = localStorage.getItem('walletId')
   if (walletId) {
@@ -272,12 +274,13 @@ function onload() {
         $('#display-wallet-name-value').append(walletDetails.name)
         $('#display-wallet-balance-value').empty()
         $('#display-wallet-balance-value').append(walletDetails.balance)
+        walletBalance = walletDetails.balance
         console.log(`Successfully fetched wallet data! Wallet data ${JSON.stringify(walletDetails)}`)
       }
     }
     var requestUrl = "/wallet/" + walletId
-    xhr.open('GET', requestUrl, true);
-    xhr.send(null);
+    xhr.open('GET', requestUrl, true)
+    xhr.send(null)
   } else {
     $('#login-container').css('display', 'flex')
     $('#transaction-dashboard').css('display', 'none')
@@ -288,7 +291,7 @@ function onload() {
 function createWallet() {
   let walletName = document.getElementById('name').value
   let balance = document.getElementById('balance').value
-  balance = parseFloat(balance.toFixed(4))
+  balance = parseFloat(balance)
   if (walletName && balance && !isNaN(balance)) {
     $('#login-container').css('display', 'none')
     $('#transaction-dashboard').css('display', 'flex')
@@ -321,8 +324,13 @@ function creditDebitAmount() {
   const walletId = localStorage.getItem('walletId')
   if (walletId && amount && !isNaN(amount)) {
     // DEBIT when creditDebitToggle is undefined
-    if (!creditDebitToggle)
+    if (!creditDebitToggle) {
+      if ((amount > walletBalance)) { // when it's debit & amount is exceeding wallet balance
+        alert(`Insufficient balance! Cannot debit :(`)
+        return
+      }
       amount = 0 - amount // negative value for debit
+    }
 
     // if no description is present then assign an empty string
     if (!description)
@@ -332,7 +340,7 @@ function creditDebitAmount() {
       amount: amount,
       description: description
     }
-    let requestUrl = "/transact/"+walletId
+    let requestUrl = "/transact/" + walletId
     var xhr = new XMLHttpRequest();
     xhr.open("POST", requestUrl, true)
     xhr.setRequestHeader('Content-type', 'application/json');
@@ -345,11 +353,15 @@ function creditDebitAmount() {
       }
     }
     xhr.send(JSON.stringify(reqBody))
-  } else if (!walletId) { 
-  	alert(`No wallet found!`)
+  } else if (!walletId) {
+    alert(`No wallet found!`)
   } else {
     alert(`Missing amount for Credit/ Debit!`)
   }
+}
+
+function seeTransactionsPage() {
+  window.location.pathname = "/view/transactions"
 }
 
 </script>

@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Your Transactions</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Transactions</title>
+  <!-- jQuery CDN  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- moment.js CDN -->
+  <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+  <!-- BOOTSTRAP CDN -->
+  <!-- CSS only -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  <!-- Export to CSV-->
+  <script src="/js/xls-export.js"></script>
 </head>
 <style type="text/css">
 @import url('https://fonts.cdnfonts.com/css/quicksand');
@@ -13,8 +23,216 @@ body {
   font-family: 'Quicksand Bold', sans-serif;
   color: #696D7D;
 }
-</style>
-<body>
 
+#top-bar {
+  display: flex;
+  justify-content: flex-start;
+  background: #D8E2DC;
+  height: 10vh;
+}
+
+h1 {
+  margin-left: 25%;
+  margin-top: 1.5%;
+  color: #696D7D;
+}
+
+th {
+  font-size: 20px;
+}
+
+tr {
+  font-size: 16px;
+}
+
+button {
+  width: 10%;
+  height: 50%;
+  font-size: 18px;
+  border-radius: 50px;
+  text-align: center;
+  background: #696D7D;
+  color: #f5f5f5;
+  cursor: pointer;
+  margin-left: 5%;
+  margin-top: 1.5%;
+}
+
+#export-csv-button {
+  margin-left: 25%;
+}
+
+img {
+  cursor: pointer;
+}
+
+#pagination-container {
+  display: flex;
+  justify-content: center;
+}
+
+</style>
+
+<body onload="onload()">
+  <div id="top-bar">
+    <button id="home-button" onclick="goToHome()">Go to Home</button>
+    <h1>Your Transactions</h1>
+    <button id="export-csv-button" onclick="exportToCSV()">Export CSV</button>
+  </div>
+  <table class="table">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Transaction Id</th>
+        <th scope="col">Wallet Id</th>
+        <th scope="col">Amount <span><img id="amount-asc-button" onclick="sortBy('amount', true)" src="/images/arrow-up.svg"><img id="amount-dsc-button" onclick="sortBy('amount', false)" src="/images/arrow-down.svg"></span></th>
+        <th scope="col">Balance</th>
+        <th scope="col">Description</th>
+        <th scope="col">Date <span><img id="date-asc-button" onclick="sortBy('date', true)" src="/images/arrow-up.svg"><img id="date-dsc-button" onclick="sortBy('date', false)" src="/images/arrow-down.svg"></span></th>
+        <th scope="col">Type</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div id="pagination-container">
+    <nav aria-label="Page navigation example">
+      <ul id="pagination" class="pagination">
+        <li id="prev-btn" class="page-item disabled" onclick="displayPrevOrNextPage(false)">
+          <a class="page-link" href="#" aria-label="Previous">
+            <span class="sr-only">Prev</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
 </body>
+<script type="text/javascript">
+var transactions
+var pageLimit = 10
+var currentPage = 1
+var pagesCount
+var activePageButton = "page-btn-1" // 1 is active on init
+
+function onload() {
+  const walletId = localStorage.getItem('walletId')
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+      transactions = JSON.parse(xhr.responseText)
+      console.log(`TRANSACTIONS ${JSON.stringify(transactions)}`)
+      // Make all values of amount as positive
+      transactions.forEach((transaction) => {
+        if (transaction.amount < 0)
+          transaction.amount = 0 - transaction.amount
+      })
+
+      pagesCount = Math.ceil(parseInt(transactions.length) / parseInt(pageLimit))
+      displayPage(1) // Table contents
+      createPagination(pagesCount) // Pagination buttons
+    }
+  }
+  var requestUrl = "/transactions?walletId=" + walletId
+  xhr.open('GET', requestUrl, true);
+  xhr.send(null);
+}
+
+function createTable(transactionsArray) {
+  let transactionCount = 1
+  transactionsArray.forEach((transactionData) => {
+    $('tbody').append(`<tr id="row-${transactionCount}"></tr>`) // create row
+
+    let rowSelector = `#row-${transactionCount}`
+    // Append cells to row
+    $(rowSelector).append(`<th scope='row'>${transactionCount}</th>`)
+    $(rowSelector).append(`<td>${transactionData.id}</td>`)
+    $(rowSelector).append(`<td>${transactionData.walletId}</td>`)
+    $(rowSelector).append(`<td>${transactionData.amount}</td>`)
+    $(rowSelector).append(`<td>${transactionData.balance}</td>`)
+    $(rowSelector).append(`<td>${transactionData.description}</td>`)
+    $(rowSelector).append(`<td>${moment(transactionData.date).format('Do MMM YYYY, h:mm a')}</td>`)
+    $(rowSelector).append(`<td>${transactionData.type}</td>`)
+    transactionCount++
+  })
+}
+
+function sortBy(sortByType, ascendingOrder) {
+  switch (sortByType) {
+    case 'amount':
+      transactions.sort((a, b) => a.amount - b.amount)
+      break;
+    case 'date':
+      transactions.sort((a, b) => {
+        return new Date(a.date).getTime() - new Date(b.date).getTime()
+      })
+  }
+  if (!ascendingOrder) {
+    transactions.reverse()
+  }
+  $('tbody').empty()
+  displayPage(1)
+}
+
+function createPagination(pagesCount) {
+  for (let i = 1; i <= pagesCount; i++) {
+    if (i == 1)
+      $('#pagination').append(`<li id ="page-btn-${i}" class="page-item active" onclick="displayPage(${i})"><a class="page-link" href="#">${i}</a></li>`)
+    else
+      $('#pagination').append(`<li id ="page-btn-${i}" class="page-item" onclick="displayPage(${i})"><a class="page-link" href="#">${i}</a></li>`)
+  }
+  $('#pagination').append(`<li id="next-btn" class="page-item" onclick="displayPrevOrNextPage(true)"><a class="page-link" href="#" aria-label="Next"><span>Next</span></a></li>`)
+}
+
+function displayPage(pageNumber) {
+  currentPage = pageNumber
+
+  /****** Changes in pagination buttons ******/
+  // Prev button
+  if (currentPage > 1)
+    $('#prev-btn').removeClass("disabled") // enable Prev button when not on first page
+  if (currentPage == 1)
+    $('#prev-btn').addClass("disabled") // disable Prev button when on first page
+
+  // Next button
+  if ((currentPage == pagesCount) || (pagesCount == 1))
+    $('#next-btn').addClass("disabled") // disable Next button on last page
+  if (currentPage < pagesCount)
+    $('#next-btn').removeClass("disabled") // enable Prev button when not on first page
+
+  // Number buttons
+  $(`#${activePageButton}`).removeClass("active") // remove active from previously active button
+  activePageButton = `page-btn-${pageNumber}` // update current active button
+  $(`#${activePageButton}`).addClass("active") // set active for current active button
+
+
+  /****** Add contents to table ******/
+  $('tbody').empty()
+  let arrayStartIndex = (pageNumber - 1) * pageLimit // Eg, pageNumber = 2, pageLimit = 10. arrayStartingIndex = 10
+  let arrayEndIndex = ((pageNumber - 1) * pageLimit) + (pageLimit - 1)
+
+  // if arrayEndIndex is greater than last index of array, set it to last index
+  if (arrayEndIndex > transactions.length - 1)
+    arrayEndIndex = transactions.length - 1
+
+  let slicedArray = transactions.slice(arrayStartIndex, arrayEndIndex + 1)
+  createTable(slicedArray)
+}
+
+function displayPrevOrNextPage(displayNextPage) {
+  if (displayNextPage && currentPage < pagesCount) // Next page
+    displayPage(currentPage + 1)
+  else if (!displayNextPage && currentPage > 1) // Previous page
+    displayPage(currentPage - 1)
+}
+
+function goToHome() {
+  window.location.pathname = "/"
+}
+
+function exportToCSV() {
+  const xls = new XlsExport(transactions, "transactions");
+  xls.exportToCSV()
+}
+
+</script>
+
 </html>
