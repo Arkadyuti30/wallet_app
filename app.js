@@ -49,6 +49,12 @@ try {
   return;
 }//-•
 
+app.listen(process.env.PORT);
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 1337;
+}
+app.listen(port);
 
 // Start server
 sails.lift(rc('sails'));

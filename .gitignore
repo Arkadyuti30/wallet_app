@@ -132,3 +132,7 @@ lib-cov
 *.out
 *.pid
 
+/node_modules
+npm-debug.log
+.DS_Store
+/*.env
