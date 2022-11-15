@@ -2,6 +2,8 @@
 
 This app has been hosted on <b>Heroku</b>. [You can access this app publicly here](https://warm-forest-96436.herokuapp.com/) 
 
+[See a video demo of this app here](https://www.loom.com/share/73a64749350d431b8f61da7b79a70aa7)
+
 ### What is Wallet App?
 This is a wallet app with the following features:
 - Setup wallet
