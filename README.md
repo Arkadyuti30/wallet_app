@@ -12,7 +12,7 @@ This is a wallet app with the following features:
 - Get wallet details
 
 ### API endpoints in this project
-This is a wallet app with the following features:
+This is a wallet app with the following apis:
 #### Setup wallet - /setup
    - Sample request: POST /setup
    - Request body: 
